@@ -2,14 +2,15 @@ from collections import defaultdict
 import numpy as np
 
 
-class MarkovText(object):
+class MarkovText:
+    """Generates text using a first-order Markov chain model."""
 
     def __init__(self, corpus):
         self.corpus = corpus
-        self.term_dict = None  # you'll need to build this
+        self.term_dict = None
 
     def get_term_dict(self):
-
+        """Build a transition dictionary mapping each word to its possible successors."""
         term_dict = defaultdict(list)
         tokens = self.corpus.split()
 
@@ -20,18 +21,28 @@ class MarkovText(object):
 
         self.term_dict = dict(term_dict)
 
-        return None
-
-
     def generate(self, seed_term=None, term_count=15):
+        """
+        Generate text using the Markov chain.
 
+        Args:
+            seed_term (str, optional): Starting word. Randomly chosen if not provided.
+            term_count (int): Number of words to generate. Defaults to 15.
 
+        Returns:
+            str: Generated text as a single string.
+
+        Raises:
+            ValueError: If term_dict not built or seed_term not in corpus.
+        """
         if self.term_dict is None:
-            raise ValueError("Term dictionary not built. Run get_term_dict() first.")
+            raise ValueError(
+                "Term dictionary not built. Run get_term_dict() first."
+            )
 
         if seed_term:
             if seed_term not in self.term_dict:
-                raise ValueError("Seed term not in corpus")
+                raise ValueError("Seed term not in corpus.")
             current_word = seed_term
         else:
             current_word = np.random.choice(list(self.term_dict.keys()))
@@ -39,15 +50,11 @@ class MarkovText(object):
         generated_words = [current_word]
 
         for _ in range(term_count - 1):
-
             if current_word not in self.term_dict:
                 break
 
             next_word = np.random.choice(self.term_dict[current_word])
             generated_words.append(next_word)
-
             current_word = next_word
 
         return " ".join(generated_words)
-
-      
